@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "varta.cdac.app"
-        minSdkVersion 23
+        minSdkVersion 24
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -41,4 +41,10 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
+    //QR Code scanning dependencies
+    implementation 'com.journeyapps:zxing-android-embedded:4.2.0'
+
+    //Permissions handling dependencies
+    implementation 'pub.devrel:easypermissions:3.0.0'
 }
