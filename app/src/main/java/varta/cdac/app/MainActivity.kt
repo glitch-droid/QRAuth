@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
         scanCode!!.setOnClickListener {
             cv2!!.visibility = View.VISIBLE
             cv1!!.visibility = View.GONE
-            label!!.text = "Scan Code Here"
+            label!!.text = "Tap on icon to Scan Code"
 
         }
         cv2!!.setOnClickListener{
@@ -141,7 +141,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
     }
 
     override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
-        TODO("Not yet implemented")
+        cameraTask()
     }
 
 }
