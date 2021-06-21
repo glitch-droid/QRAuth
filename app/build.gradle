@@ -47,4 +47,8 @@ dependencies {
 
     //Permissions handling dependencies
     implementation 'pub.devrel:easypermissions:3.0.0'
+
+    //Retrofit 2
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.1.0'
 }
