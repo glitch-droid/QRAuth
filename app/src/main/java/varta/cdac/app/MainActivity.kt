@@ -14,6 +14,13 @@ import com.journeyapps.barcodescanner.CaptureActivity
 import org.json.JSONException
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import varta.cdac.app.model.Data
+import varta.cdac.app.services.TestApi
 
 class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, EasyPermissions.PermissionCallbacks {
 
@@ -21,9 +28,10 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
     private var scanCode : Button? = null
     private var cv1 : CardView? = null
     private var cv2 : CardView? = null
-    private var editCode : EditText? = null
+    private var scannedCode : TextView? = null
     private var label : TextView? =null
-    private var btnEnter : Button? = null
+    private var btnSend : Button? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -32,9 +40,9 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
         scanCode = findViewById(R.id.scan_code_button)
         cv1 = findViewById(R.id.cardView1)
         cv2 = findViewById(R.id.cardView2)
-        editCode = findViewById(R.id.code_ET)
+        scannedCode = findViewById(R.id.code_TV)
         label = findViewById(R.id.helperTV)
-        btnEnter = findViewById(R.id.codeEnter)
+        btnSend = findViewById(R.id.sendCode)
 
         label!!.text = "Scan Code Here"
         cv2!!.visibility = View.VISIBLE
@@ -55,14 +63,37 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
             label!!.text = "Enter Code Here"
         }
 
-        btnEnter!!.setOnClickListener {
-            if( editCode!!.text.toString().isEmpty()){
-                Toast.makeText(this,"Please Enter Code", Toast.LENGTH_SHORT).show()
+        btnSend!!.setOnClickListener {
+            if( scannedCode!!.text.toString().isEmpty()){
+                Toast.makeText(this,"QR code not readeable or invalid", Toast.LENGTH_SHORT).show()
             }else{
-                var value = editCode!!.text.toString()
-                Toast.makeText(this,value, Toast.LENGTH_SHORT).show()
+                val value = scannedCode!!.text.toString()
+                //Toast.makeText(this,value, Toast.LENGTH_SHORT).show()
+                setUpCall(value);
             }
         }
+    }
+
+    private fun setUpCall(value: String) {
+        val retrofitBuilder = Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create())
+            .baseUrl("https://jsonplaceholder.typicode.com/")
+            .build()
+
+        val testApi = retrofitBuilder.create(TestApi::class.java)
+        val data = Data(1, 1, "QR Auth", value);
+        val call = testApi.sendData(data)
+
+        call.enqueue(object : Callback<Data>{
+            override fun onResponse(call: Call<Data>, response: Response<Data>) {
+                Toast.makeText(this@MainActivity, "Response Code " + response.code().toString(), Toast.LENGTH_LONG).show()
+            }
+
+            override fun onFailure(call: Call<Data>, t: Throwable) {
+                Toast.makeText(this@MainActivity, "Error in sending QR code " + t.message.toString(),Toast.LENGTH_LONG).show()
+            }
+        })
+
     }
 
     private fun hasCameraAccess() : Boolean
@@ -95,15 +126,15 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
         if(result!=null){
             if(result.contents==null){
                 Toast.makeText(this,"Not found", Toast.LENGTH_SHORT).show()
-                editCode!!.setText("")
+                scannedCode!!.setText("")
             }else{
                 try{
                     cv1!!.visibility = View.VISIBLE
                     cv2!!.visibility = View.GONE
-                    editCode!!.setText(result.contents.toString())
+                    scannedCode!!.setText(result.contents.toString())
                 }catch (exception: JSONException){
                     Toast.makeText(this,exception.localizedMessage, Toast.LENGTH_SHORT).show()
-                    editCode!!.setText("")
+                    scannedCode!!.setText("")
 
                 }
             }
