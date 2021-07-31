@@ -4,11 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Button
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import com.airbnb.lottie.LottieAnimationView
 import com.google.gson.GsonBuilder
 import com.google.zxing.integration.android.IntentIntegrator
 import com.journeyapps.barcodescanner.CaptureActivity
@@ -20,6 +19,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import varta.cdac.app.constants.ConfigValues
 import varta.cdac.app.model.LoginResponse
 import varta.cdac.app.services.ApiService
 
@@ -30,9 +30,11 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
     private var scanCode : Button? = null
     private var cv1 : CardView? = null
     private var cv2 : CardView? = null
-    private var scannedCode : TextView? = null
+    private var scannedCode : EditText? = null
     private var label : TextView? =null
     private var btnSend : Button? = null
+    private var done : LottieAnimationView?=null
+    private var error : LottieAnimationView?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +47,8 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
         scannedCode = findViewById(R.id.code_TV)
         label = findViewById(R.id.helperTV)
         btnSend = findViewById(R.id.sendCode)
+        done = findViewById(R.id.anim_done)
+        error = findViewById(R.id.anim_error)
 
         label!!.text = "Scan Code Here"
         cv2!!.visibility = View.VISIBLE
@@ -53,6 +57,8 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
             cv2!!.visibility = View.VISIBLE
             cv1!!.visibility = View.GONE
             label!!.text = "Tap on icon to Scan Code"
+            error!!.visibility = View.GONE
+            done!!.visibility = View.GONE
 
         }
         cv2!!.setOnClickListener{
@@ -63,6 +69,8 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
             cv2!!.visibility = View.GONE
             cv1!!.visibility = View.VISIBLE
             label!!.text = "Enter Code Here"
+            error!!.visibility = View.GONE
+            done!!.visibility = View.GONE
         }
 
         btnSend!!.setOnClickListener {
@@ -71,7 +79,8 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
             }else{
                 val value = scannedCode!!.text.toString()
                 //Toast.makeText(this,value, Toast.LENGTH_SHORT).show()
-                setUpCall(value);
+                setUpCall(value)
+
             }
         }
     }
@@ -80,7 +89,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
         val gson = GsonBuilder().setLenient().create()
         val retrofitBuilder = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create(gson))
-            .baseUrl("https://cdacvarta.herokuapp.com/")
+            .baseUrl(ConfigValues.BASE_URL)
             .build()
 
         val testApi = retrofitBuilder.create(ApiService::class.java)
@@ -96,17 +105,20 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
                 Toast.makeText(this@MainActivity, "Response Code " + response.code().toString(), Toast.LENGTH_LONG).show()
                 if(response.code() == 400)
                 {
-
+                    error!!.visibility = View.VISIBLE
+                    Log.d("A",response.message() );
+                }else if(response.code()==200){
+                    done!!.visibility = View.VISIBLE
                     Log.d("A",response.message() );
                 }
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
+                error!!.visibility = View.VISIBLE
                 Log.d("A",t.message.toString() );
                 Toast.makeText(this@MainActivity, "Error in sending QR code " + t.message.toString(),Toast.LENGTH_LONG).show()
             }
         })
-
     }
 
     private fun hasCameraAccess() : Boolean
