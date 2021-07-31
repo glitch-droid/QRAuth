@@ -23,6 +23,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import varta.cdac.app.constants.ConfigValues
 import varta.cdac.app.model.LoginResponse
 import varta.cdac.app.services.ApiService
+import java.lang.Exception
 
 
 class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, EasyPermissions.PermissionCallbacks {
@@ -58,21 +59,8 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
 
         }
         cv!!.setOnClickListener{
-
             cameraTask()
-            if(scannedCode=="NULL"){
-                label!!.text = "Error!"
-                cv!!.visibility = View.INVISIBLE
-                error!!.visibility = View.VISIBLE
-                Toast.makeText(this,"Please Scan a QR Code", Toast.LENGTH_SHORT).show()
-            }
-            if(scannedCode!="NULL"){
-                    label!!.text = "Verifying..."
-                    cv!!.visibility = View.INVISIBLE
-                    loading!!.visibility = View.VISIBLE
-                    setUpCall(scannedCode)
-                }
-            }
+        }
     }
 
     private fun setUpCall(value: String) {
@@ -83,23 +71,24 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
             .build()
 
         val testApi = retrofitBuilder.create(ApiService::class.java)
-        val modifiedValue = "{$value}";
+        val modifiedValue = value;
         val call = testApi.login(modifiedValue)
 
         call.enqueue(object : Callback<String>{
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 Toast.makeText(this@MainActivity, "Response Code " + response.code().toString(), Toast.LENGTH_LONG).show()
-                if(response.code() == 400)
-                {
-                    label!!.text="Error!"
-                    loading!!.visibility=View.INVISIBLE
-                    error!!.visibility = View.VISIBLE
-                    Log.d("A",response.message());
-                }else if(response.code()==200){
+                if(response.code()==200){
                     label!!.text="Success!"
                     loading!!.visibility=View.INVISIBLE
                     done!!.visibility = View.VISIBLE
                     Log.d("A",response.message() );
+                }
+                if(response.code() == 400)
+                {
+                    label!!.text = "Error!"
+                    loading!!.visibility = View.INVISIBLE
+                    error!!.visibility = View.VISIBLE
+                    Log.d("A", response.message());
                 }
             }
 
@@ -120,7 +109,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
 
     private fun cameraTask(){
         if(hasCameraAccess()){
-            val qrScanner = IntentIntegrator(this)
+            val qrScanner = IntentIntegrator(this).setBarcodeImageEnabled(true)
             qrScanner.setPrompt("Scan a QR code")
                 .setCameraId(0)
                 .setOrientationLocked(true)
@@ -142,10 +131,16 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
         val result = IntentIntegrator.parseActivityResult(requestCode,resultCode,data)
         if(result!=null){
             if(result.contents==null){
-                scannedCode="NULL"
-                Toast.makeText(this,"Not found", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this,"QR Code not detected", Toast.LENGTH_SHORT).show()
             }else{
-                scannedCode=result.contents.toString()
+                try {
+                    loading!!.visibility = View.VISIBLE
+                    cv!!.visibility  =View.INVISIBLE
+                    label!!.text="Verifying..."
+                    setUpCall(result.contents.toString())
+                }catch (e:Exception){
+                    Log.e("Error",e.toString())
+                }
             }
         }else{
             Toast.makeText(this,"An error occurred", Toast.LENGTH_SHORT).show()
