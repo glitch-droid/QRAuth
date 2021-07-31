@@ -1,6 +1,7 @@
 package varta.cdac.app
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -26,63 +27,52 @@ import varta.cdac.app.services.ApiService
 
 class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, EasyPermissions.PermissionCallbacks {
 
-    private var enterCode : Button? = null
     private var scanCode : Button? = null
-    private var cv1 : CardView? = null
-    private var cv2 : CardView? = null
-    private var scannedCode : EditText? = null
+    private var cv : CardView? = null
+    private var scannedCode : String = ""
+    private var value:String ="1"
     private var label : TextView? =null
-    private var btnSend : Button? = null
     private var done : LottieAnimationView?=null
     private var error : LottieAnimationView?=null
+    private var loading : LottieAnimationView?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        enterCode = findViewById(R.id.enter_code_button)
         scanCode = findViewById(R.id.scan_code_button)
-        cv1 = findViewById(R.id.cardView1)
-        cv2 = findViewById(R.id.cardView2)
-        scannedCode = findViewById(R.id.code_TV)
+        cv = findViewById(R.id.cardView)
         label = findViewById(R.id.helperTV)
-        btnSend = findViewById(R.id.sendCode)
         done = findViewById(R.id.anim_done)
         error = findViewById(R.id.anim_error)
+        loading = findViewById(R.id.anim_loading)
 
-        label!!.text = "Scan Code Here"
-        cv2!!.visibility = View.VISIBLE
+        cv!!.visibility = View.VISIBLE
 
         scanCode!!.setOnClickListener {
-            cv2!!.visibility = View.VISIBLE
-            cv1!!.visibility = View.GONE
-            label!!.text = "Tap on icon to Scan Code"
+            cv!!.visibility = View.VISIBLE
+            label!!.text = "Tap on icon to scan code"
             error!!.visibility = View.GONE
             done!!.visibility = View.GONE
+            loading!!.visibility = View.GONE
 
         }
-        cv2!!.setOnClickListener{
+        cv!!.setOnClickListener{
 
             cameraTask()
-        }
-        enterCode!!.setOnClickListener {
-            cv2!!.visibility = View.GONE
-            cv1!!.visibility = View.VISIBLE
-            label!!.text = "Enter Code Here"
-            error!!.visibility = View.GONE
-            done!!.visibility = View.GONE
-        }
-
-        btnSend!!.setOnClickListener {
-            if( scannedCode!!.text.toString().isEmpty()){
-                Toast.makeText(this,"QR code not readeable or invalid", Toast.LENGTH_SHORT).show()
-            }else{
-                val value = scannedCode!!.text.toString()
-                //Toast.makeText(this,value, Toast.LENGTH_SHORT).show()
-                setUpCall(value)
-
+            if(scannedCode=="NULL"){
+                label!!.text = "Error!"
+                cv!!.visibility = View.INVISIBLE
+                error!!.visibility = View.VISIBLE
+                Toast.makeText(this,"Please Scan a QR Code", Toast.LENGTH_SHORT).show()
             }
-        }
+            if(scannedCode!="NULL"){
+                    label!!.text = "Verifying..."
+                    cv!!.visibility = View.INVISIBLE
+                    loading!!.visibility = View.VISIBLE
+                    setUpCall(scannedCode)
+                }
+            }
     }
 
     private fun setUpCall(value: String) {
@@ -93,27 +83,29 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
             .build()
 
         val testApi = retrofitBuilder.create(ApiService::class.java)
-        //val data = Data(1, 1, "QR Auth", value);
-        //val paramObject = JSONObject()
-        //paramObject.put("QRtoken")
-        val modified_value = "{$value}";
-        val tokenObject = LoginResponse(modified_value)
-        val call = testApi.login(value)
+        val modifiedValue = "{$value}";
+        val call = testApi.login(modifiedValue)
 
         call.enqueue(object : Callback<String>{
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 Toast.makeText(this@MainActivity, "Response Code " + response.code().toString(), Toast.LENGTH_LONG).show()
                 if(response.code() == 400)
                 {
+                    label!!.text="Error!"
+                    loading!!.visibility=View.INVISIBLE
                     error!!.visibility = View.VISIBLE
-                    Log.d("A",response.message() );
+                    Log.d("A",response.message());
                 }else if(response.code()==200){
+                    label!!.text="Success!"
+                    loading!!.visibility=View.INVISIBLE
                     done!!.visibility = View.VISIBLE
                     Log.d("A",response.message() );
                 }
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
+                label!!.text="Error!"
+                loading!!.visibility=View.GONE
                 error!!.visibility = View.VISIBLE
                 Log.d("A",t.message.toString() );
                 Toast.makeText(this@MainActivity, "Error in sending QR code " + t.message.toString(),Toast.LENGTH_LONG).show()
@@ -128,7 +120,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
 
     private fun cameraTask(){
         if(hasCameraAccess()){
-            var qrScanner = IntentIntegrator(this)
+            val qrScanner = IntentIntegrator(this)
             qrScanner.setPrompt("Scan a QR code")
                 .setCameraId(0)
                 .setOrientationLocked(true)
@@ -150,18 +142,10 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
         val result = IntentIntegrator.parseActivityResult(requestCode,resultCode,data)
         if(result!=null){
             if(result.contents==null){
+                scannedCode="NULL"
                 Toast.makeText(this,"Not found", Toast.LENGTH_SHORT).show()
-                scannedCode!!.setText("")
             }else{
-                try{
-                    cv1!!.visibility = View.VISIBLE
-                    cv2!!.visibility = View.GONE
-                    scannedCode!!.setText(result.contents.toString())
-                }catch (exception: JSONException){
-                    Toast.makeText(this,exception.localizedMessage, Toast.LENGTH_SHORT).show()
-                    scannedCode!!.setText("")
-
-                }
+                scannedCode=result.contents.toString()
             }
         }else{
             Toast.makeText(this,"An error occurred", Toast.LENGTH_SHORT).show()
@@ -170,7 +154,6 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
         if(requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE){
             Toast.makeText(this,"Permission Granted", Toast.LENGTH_SHORT).show()
         }
-
     }
 
     override fun onRequestPermissionsResult(
