@@ -1,14 +1,15 @@
 package varta.cdac.app
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import com.google.gson.GsonBuilder
 import com.google.zxing.integration.android.IntentIntegrator
 import com.journeyapps.barcodescanner.CaptureActivity
 import org.json.JSONException
@@ -19,8 +20,9 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import varta.cdac.app.model.Data
-import varta.cdac.app.services.TestApi
+import varta.cdac.app.model.LoginResponse
+import varta.cdac.app.services.ApiService
+
 
 class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, EasyPermissions.PermissionCallbacks {
 
@@ -75,21 +77,32 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
     }
 
     private fun setUpCall(value: String) {
+        val gson = GsonBuilder().setLenient().create()
         val retrofitBuilder = Retrofit.Builder()
-            .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl("https://jsonplaceholder.typicode.com/")
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .baseUrl("https://cdacvarta.herokuapp.com/")
             .build()
 
-        val testApi = retrofitBuilder.create(TestApi::class.java)
-        val data = Data(1, 1, "QR Auth", value);
-        val call = testApi.sendData(data)
+        val testApi = retrofitBuilder.create(ApiService::class.java)
+        //val data = Data(1, 1, "QR Auth", value);
+        //val paramObject = JSONObject()
+        //paramObject.put("QRtoken")
+        val modified_value = "{$value}";
+        val tokenObject = LoginResponse(modified_value)
+        val call = testApi.login(value)
 
-        call.enqueue(object : Callback<Data>{
-            override fun onResponse(call: Call<Data>, response: Response<Data>) {
+        call.enqueue(object : Callback<String>{
+            override fun onResponse(call: Call<String>, response: Response<String>) {
                 Toast.makeText(this@MainActivity, "Response Code " + response.code().toString(), Toast.LENGTH_LONG).show()
+                if(response.code() == 400)
+                {
+
+                    Log.d("A",response.message() );
+                }
             }
 
-            override fun onFailure(call: Call<Data>, t: Throwable) {
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                Log.d("A",t.message.toString() );
                 Toast.makeText(this@MainActivity, "Error in sending QR code " + t.message.toString(),Toast.LENGTH_LONG).show()
             }
         })
