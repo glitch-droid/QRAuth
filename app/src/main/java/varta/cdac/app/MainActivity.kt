@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import com.airbnb.lottie.LottieAnimationView
 import com.google.gson.GsonBuilder
 import com.google.zxing.integration.android.IntentIntegrator
@@ -30,8 +31,6 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
 
     private var scanCode : Button? = null
     private var cv : CardView? = null
-    private var scannedCode : String = ""
-    private var value:String ="1"
     private var label : TextView? =null
     private var done : LottieAnimationView?=null
     private var error : LottieAnimationView?=null
@@ -51,6 +50,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
         cv!!.visibility = View.VISIBLE
 
         scanCode!!.setOnClickListener {
+            scanCode!!.isEnabled
             cv!!.visibility = View.VISIBLE
             label!!.text = "Tap on icon to scan code"
             error!!.visibility = View.GONE
@@ -64,6 +64,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
     }
 
     private fun setUpCall(value: String) {
+        scanCode!!.isEnabled = false
         val gson = GsonBuilder().setLenient().create()
         val retrofitBuilder = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create(gson))
@@ -82,6 +83,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
                     loading!!.visibility=View.INVISIBLE
                     done!!.visibility = View.VISIBLE
                     Log.d("A",response.message() );
+                    scanCode!!.isEnabled = true
                 }
                 if(response.code() == 400)
                 {
@@ -89,6 +91,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
                     loading!!.visibility = View.INVISIBLE
                     error!!.visibility = View.VISIBLE
                     Log.d("A", response.message());
+                    scanCode!!.isEnabled = true
                 }
             }
 
