@@ -82,9 +82,6 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
                     label!!.text="Success!"
                     loading!!.visibility=View.INVISIBLE
                     done!!.visibility = View.VISIBLE
-                    val intent = Intent(this@MainActivity, OTPActivity::class.java)
-                    startActivity(intent)
-                    finish()
                     Log.d("A",response.message() );
                     scanCode!!.isEnabled = true
                 }
@@ -104,7 +101,6 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
                 error!!.visibility = View.VISIBLE
                 Log.d("A",t.message.toString() );
                 Toast.makeText(this@MainActivity, "Error in sending QR code " + t.message.toString(),Toast.LENGTH_LONG).show()
-                scanCode!!.isEnabled = true
             }
         })
     }
