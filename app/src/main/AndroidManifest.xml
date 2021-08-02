@@ -11,7 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.QRAuth">
-        <activity android:name=".HomeActivity"></activity>
+        <activity android:name=".HomeActivity"
+            android:theme="@style/Theme.QRAuth.NoActionBar"/>
         <activity android:name=".OTPActivity"
             android:theme="@style/Theme.QRAuth.NoActionBar"/>
         <activity
