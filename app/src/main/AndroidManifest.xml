@@ -12,7 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.QRAuth">
         <activity android:name=".HomeActivity"></activity>
-        <activity android:name=".OTPActivity" />
+        <activity android:name=".OTPActivity"
+            android:theme="@style/Theme.QRAuth.NoActionBar"/>
         <activity
             android:name=".MainActivity"
             android:theme="@style/Theme.QRAuth.NoActionBar">

@@ -6,37 +6,85 @@
     android:layout_height="match_parent"
     tools:context=".OTPActivity">
 
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/roboto_black"
+        android:text="Verify OTP"
+        android:textColor="@color/black"
+        android:textSize="32sp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieAnimationView"
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:layout_marginTop="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/otp_anim"
+        app:lottie_speed="0.5" />
+
 
     <EditText
         android:id="@+id/edit_text_otp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:ems="6"
-        android:inputType="numberDecimal"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:fontFamily="@font/quicksand_medium"
+        android:inputType="numberPassword"
+        android:textAlignment="center"
+        android:textColor="@color/purple_700"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:foregroundTint="@color/black"
+        android:background="@drawable/otp_bgr"
+        android:layout_marginTop="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <TextView
         android:id="@+id/textView"
-        android:padding="100px"
-        android:textSize="20sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:drawablePadding="6dp"
+        android:fontFamily="@font/roboto_light"
+        android:padding="40dp"
         android:text="@string/OTP_Message"
-        app:layout_constraintBottom_toTopOf="@+id/edit_text_otp"
+        android:textColor="@color/gray"
+        android:textSize="16sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/lottieAnimationView"
+        app:drawableTint="@color/blue"
+        app:drawableStartCompat="@drawable/info" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/login_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginLeft="100dp"
+        android:layout_marginRight="100dp"
+        android:backgroundTint="@color/blue"
+        android:fontFamily="@font/roboto_medium"
         android:text="Login"
+        android:textColor="@color/white"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_text_otp" />
+        app:layout_constraintTop_toBottomOf="@+id/edit_text_otp"
+        app:layout_constraintVertical_bias="0.32999998"
+        app:rippleColor="@color/purple_700" />
 </androidx.constraintlayout.widget.ConstraintLayout>

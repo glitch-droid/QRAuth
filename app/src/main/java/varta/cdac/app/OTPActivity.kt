@@ -9,11 +9,12 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.cardview.widget.CardView
+import com.google.android.material.button.MaterialButton
 import java.util.*
 
 class OTPActivity : AppCompatActivity() {
     private var editTextOtp : EditText? = null
-    private var loginBtn : Button? = null
+    private var loginBtn : MaterialButton? = null
     private val timer = Timer()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +38,7 @@ class OTPActivity : AppCompatActivity() {
                 handleSessionExpired()
             }
 
-        }, 10000)
+        }, 30000)
 
     }
 
