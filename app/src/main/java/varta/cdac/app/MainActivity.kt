@@ -73,16 +73,19 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
 
         val testApi = retrofitBuilder.create(ApiService::class.java)
         val modifiedValue = value;
-        val call = testApi.login(modifiedValue)
+        val call = testApi.getOtp(modifiedValue)
 
         call.enqueue(object : Callback<String>{
             override fun onResponse(call: Call<String>, response: Response<String>) {
-                Toast.makeText(this@MainActivity, "Response Code " + response.code().toString(), Toast.LENGTH_LONG).show()
+                //Toast.makeText(this@MainActivity, "Response Code " + response.code().toString(), Toast.LENGTH_LONG).show()
                 if(response.code()==200){
                     label!!.text="Success!"
                     loading!!.visibility=View.INVISIBLE
                     done!!.visibility = View.VISIBLE
+                    val otpCode=response.body()
                     val intent = Intent(this@MainActivity, OTPActivity::class.java)
+                    intent.putExtra("otp_code",otpCode)
+                    intent.putExtra("qr_code",modifiedValue)
                     startActivity(intent)
                     finish()
                     Log.d("A",response.message() );

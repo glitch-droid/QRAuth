@@ -6,6 +6,19 @@
     android:layout_height="match_parent"
     tools:context=".OTPActivity">
 
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/login_loading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:lottie_loop="true"
+        app:lottie_speed="1.2"
+        app:lottie_rawRes="@raw/line_loading"
+        app:lottie_autoPlay="true"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
@@ -18,7 +31,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/login_loading" />
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/lottieAnimationView"
