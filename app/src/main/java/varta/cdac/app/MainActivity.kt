@@ -82,9 +82,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks, Ea
                     label!!.text="Success!"
                     loading!!.visibility=View.INVISIBLE
                     done!!.visibility = View.VISIBLE
-                    val otpCode=response.body()
                     val intent = Intent(this@MainActivity, OTPActivity::class.java)
-                    intent.putExtra("otp_code",otpCode)
                     intent.putExtra("qr_code",modifiedValue)
                     startActivity(intent)
                     finish()

@@ -32,12 +32,10 @@ class OTPActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_otp)
-        val otp =intent.getStringExtra("otp_code")
         val qrCode = intent.getStringExtra("qr_code")
         editTextOtp = findViewById(R.id.edit_text_otp)
         loader=findViewById(R.id.login_loading)
         param1= qrCode.toString()
-        Toast.makeText(this,"Your OTP is $otp",Toast.LENGTH_LONG).show()
         loginBtn = findViewById(R.id.login_btn)
         startUserSession();
         loginBtn!!.setOnClickListener{
